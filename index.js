@@ -8,13 +8,17 @@ let reconnectionToken = null;
 
 const messageEventsHandler = new Map([
     [
-        "connected", 
+        "system", 
         (message) => {
             connectionId = message.connectionId;
             reconnectionToken = message.reconnectionToken;
             console.log(`${connectionId} ${token}`)
         }],
     [
+        "message",
+        (message) => {
+            console.log(message);
+        }
 
     ]
 ])
@@ -47,6 +51,8 @@ const initReliableClient = async () => {
             "type": "joinGroup",
             "group": "idf"
         }));
+
+        setInterval(async (client) => { await sendMessageToGroup(client) }, 1000);
     }
 
     client.onerror = (event) => {
@@ -55,9 +61,12 @@ const initReliableClient = async () => {
 
     client.onmessage = (message) => {
         const messageData = JSON.parse(message.data);
-        console.log(messageData.event);
-        messageEventsHandler.get(messageData.event)(messageData);
+        messageEventsHandler.get(messageData.type)(messageData);
     }
+}
+
+const sendMessageToGroup = async (client) => {
+    client
 }
 
 init();
